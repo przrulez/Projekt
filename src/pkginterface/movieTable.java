@@ -168,8 +168,10 @@ public class movieTable
         public void actionPerformed(ActionEvent e)
         {
             int id = Integer.valueOf(e.getActionCommand());
-            //dodanie do listy
-            JOptionPane.showMessageDialog(panel,"Lista " +id);
+            
+            listAddMovie wnd = new listAddMovie(id);
+            wnd.setLocationRelativeTo(null);
+            wnd.setVisible(true);
         }
     };
 }

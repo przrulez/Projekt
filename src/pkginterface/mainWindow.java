@@ -149,6 +149,30 @@ public class mainWindow extends JFrame
                 wnd.setLocationRelativeTo(null);
                 wnd.setVisible(true);
             }
+            else if(e.getSource() == Search)
+            {
+                JFrame wnd = new search();
+                wnd.setLocationRelativeTo(null);
+                wnd.setVisible(true);
+            }
+            else if(e.getSource() == MenuUstawieniaBase)
+            {
+                JFrame wnd = new settingBase();
+                wnd.setLocationRelativeTo(null);
+                wnd.setVisible(true);
+            }
+            else if(e.getSource() == MenuListAdd)
+            {
+                JFrame wnd = new listAdd();
+                wnd.setLocationRelativeTo(null);
+                wnd.setVisible(true);
+            }
+            else if(e.getSource() == MenuListList)
+            {
+                JFrame wnd = new listList();
+                wnd.setLocationRelativeTo(null);
+                wnd.setVisible(true);
+            }
             else
             {
                 System.out.println(e.getActionCommand());
