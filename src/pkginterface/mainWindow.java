@@ -151,9 +151,10 @@ public class mainWindow extends JFrame
             }
             else if(e.getSource() == Search)
             {
-                JFrame wnd = new search();
+                JFrame wnd = new search(rightPanel);
                 wnd.setLocationRelativeTo(null);
                 wnd.setVisible(true);
+                
             }
             else if(e.getSource() == MenuUstawieniaBase)
             {

@@ -33,6 +33,7 @@ public class movieTable
         panel.setPreferredSize(new Dimension(800,600));
         panel.add(comboSortuj);
         panel.add(sortuj);
+        sortuj.addActionListener(new menuActionListener());//dodanie słuchacza zdarzeń przycisku sortuj
         
         for (int i = 0; i < dane.length; i++)
         {
@@ -174,4 +175,29 @@ public class movieTable
             wnd.setVisible(true);
         }
     };
+    //obsługa zdarzenia naciśnięcia przycisku sortuj
+    private class menuActionListener implements ActionListener {
+
+        public void actionPerformed(ActionEvent e) {
+
+            if (e.getSource() == sortuj) { 
+                panel.removeAll();
+                
+                
+                sortTable sort = new sortTable();
+                Object benchmark = comboSortuj.getSelectedItem(); //odczytanie wybranej wartości comboBoxa
+                Object sortedData[][] = sort.sortTable(benchmark); //pobranie posortowanej tablicy
+                
+                JPanel temp = new movieTable(sortedData).getPanel();
+                temp.setLocation(0, 0);
+                temp.setSize(820, 600);
+
+                panel.add(temp);
+                panel.repaint();
+
+            }
+
+        }
+    }
+
 }
