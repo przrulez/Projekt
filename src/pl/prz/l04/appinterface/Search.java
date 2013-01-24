@@ -1,9 +1,15 @@
 package pl.prz.l04.appinterface;
 
+import com.j256.ormlite.dao.Dao;
 import javax.swing.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.sql.*;
+import java.util.List;
+import pl.prz.l04.database.CatMovies;
+import pl.prz.l04.database.Categories;
+import pl.prz.l04.database.DataBase;
+import pl.prz.l04.database.Movies;
 
 /**
  *
@@ -16,9 +22,11 @@ public class Search extends JFrame {
     JTextField field1, field2;
     JFrame frame;
     JComboBox categories;
-    Connection c = null;
+    private Dao<Categories, Integer> Cat = null;
     Object data[][];
     JPanel rightPanel;
+    private final Dao<Movies, Integer> Mov;
+    private final Dao<CatMovies, Integer> CatMov;
 
     Search(JPanel mainPanel) {
         String name[];
@@ -90,49 +98,30 @@ public class Search extends JFrame {
         add(field2);
         add(categories);
         add(button);
+        Mov = DataBase.getInstance().getMoviesDao();
+        CatMov = DataBase.getInstance().getCatMovDao();
     }
 
     public String[] Connection() {
 
         String[] name = new String[50]; //zmienna na kategorie pobrane z bazy
         // łączymy się z bazą danych
-        try {
-            Class.forName("com.mysql.jdbc.Driver").newInstance();
-            c = DriverManager.getConnection("jdbc:mysql://localhost/movies", "root", "");
-            System.out.println("Udało się połączyć z bazą danych...");
-        } catch (ClassNotFoundException e) {
-            System.out.println("Problem z driverem bazy danych...");
-        } catch (SQLException e) {
-            System.out.println("Nie można połączyć się z baza danych...");
-        } catch (Exception e) {
-            System.out.println("Błąd przy połączeniu z bazą danych...");
-        }
+        
         int size = 1;
         // wykonujemy SELECT i wypisujemy wynik zapytania na ekran
         try {
-            Statement st = c.createStatement();
-            ResultSet rs = st.executeQuery("SELECT name FROM categories");
+            Cat = DataBase.getInstance().getCategoriesDao();
+            List<Categories> rs = Cat.queryForAll();
             int i = 1;
             
             name[0] = "Wszystkie kategorie";
-            while (rs.next()) {
-                name[i] = rs.getString("name");
+            for(Categories item : rs) {
+                name[i] = item.getName();
                 i++;
                 size++;
             }
-            rs.close();
         } catch (Exception e) {
-            System.out.println("Błąd przy pobieraniu danych...");
-        }
-
-        // zamykamy połączenie (jeżeli było otwarte)
-        if (c != null) {
-            try {
-//                c.close();
-//                System.out.println("Połączenie z bazą danych zamknięte...");
-            } catch (Exception e) {
-                System.out.println("Błąd przy zamykaniu bazy danych...");
-            }
+            System.out.println("Błąd przy pobieraniu danych o kategoriach... Search");
         }
         //zmniejszenie wielkosci tablicy dla lepszego wyswietlenia
         String[] kategorie = new String[size];
@@ -147,52 +136,55 @@ public class Search extends JFrame {
         try {
             String query = null;
             String warunek = null;
+            List<Movies> moviesList = null;
 
-            if (category != "Wszystkie kategorie") {
-                warunek = "AND m.id=cm.movie_id AND cm.category_id=c.id AND c.name='" + category + "'";
-            } else {
-                warunek = "";
+            // If conditions are not set, broadest possible search will be made
+            if(nazwa.isEmpty())
+                nazwa = "*";
+            if(opis.isEmpty())
+                opis = "*";
+            if(category.isEmpty())
+                category = "*";
+            
+            if (category == "Wszystkie kategorie") {
+                moviesList =
+                        Mov.query(
+                        Mov.queryBuilder().where()
+                        .like("name", nazwa)
+                        .and()
+                        .like("content", opis)
+                        .prepare());
+            } else if (category != "Wszystkie kategorie") {
+                List<Categories> lookUpCat = Cat.queryForEq("name", category);
+                List<CatMovies> lookUpCatMov = 
+                        CatMov.query(
+                        CatMov.queryBuilder()
+                        .selectColumns("movies")
+                        .where()
+                        .eq("name", lookUpCat.get(0).getId())
+                        .prepare());
+                moviesList =
+                        Mov.query(
+                        Mov.queryBuilder().where()
+                        .like("name", nazwa)
+                        .and()
+                        .like("content", opis)
+                        .in("id", lookUpCatMov)
+                        .prepare());
             }
-            Statement st = c.createStatement();
-            // szukanie po nazwie  i kategorii
-            if (opis.isEmpty() && !nazwa.isEmpty()) {
-                query = "SELECT  DISTINCT(m.id), m.name, m.created FROM movies m, categories_movies cm, categories c"
-                        + " WHERE m.name LIKE '%" + nazwa + "%' " + warunek + " ";
-            }
-            //szukanie po opisie i kategorii
-            if (!opis.isEmpty() && nazwa.isEmpty()) {
-                query = "SELECT DISTINCT(m.id), m.name, m.created FROM movies m, categories_movies cm, categories c"
-                        + " WHERE m.content LIKE '%" + opis + "%' " + warunek + " ";
-            }
-            //szukanie po opisie kategorii i nazwie
-            if (!opis.isEmpty() && !nazwa.isEmpty()) {
-                query = "SELECT DISTINCT(m.id), m.name, m.created FROM movies m, categories_movies cm, categories c"
-                        + " WHERE m.content LIKE '%" + opis + "%' AND m.name LIKE '%" + nazwa + "%' " + warunek + " ";
-            }
-            //szukanie tylko po kategorii
-            if (opis.isEmpty() && nazwa.isEmpty()) {
-                query = "SELECT DISTINCT(m.id), m.name, m.created FROM movies m, categories_movies cm, categories c"
-                        + " WHERE 1=1 " + warunek + " ";
-            }
-
-            ResultSet rs = st.executeQuery(query);
-            int size = 1;           // wartosc 1, miejsce na informacje o braku wynikow
-            //rozmiar dla tablicy
-            while (rs.next()) {
-                size++;
-            }
-            if(size > 1)
-                size--;             // znaleziono film, usuniecie miejsca na info o braku wynikow
-            rs = st.executeQuery(query);
+            
+            int size = moviesList.size();
+            if( size == 0)
+                size++;             // miejsce na "brak wyników"
             data = new Object[size][4];
             String films;           // nazwa filmu
             String created;         // nazwa kateogri
             int i = 0;              // inkdes tablicy
             int id;                 // id filmu
-            while (rs.next()) {     // wpisanie do tablicy wszystkich istniejacych filmow
-                films = rs.getString("name");
-                created = rs.getString("created");
-                id = rs.getInt("id");
+            for(Movies item : moviesList) {     // wpisanie do tablicy wszystkich istniejacych filmow
+                films = item.getName();
+                created = item.getCreated().toString();
+                id = item.getId();
                 data[i][0] = id;
                 data[i][1] = films;
                 data[i][2] = category;
@@ -209,10 +201,8 @@ public class Search extends JFrame {
                data[i][3] = "-";
              }
             
-            
-            rs.close();
         } catch (Exception e) {
-            System.out.println("Błąd przy pobieraniu danych...");
+            System.out.println("Błąd przy pobieraniu danych... Search");
         }
 
         
