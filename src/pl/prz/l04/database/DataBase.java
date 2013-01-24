@@ -27,7 +27,7 @@ public class DataBase {
     private DataBase()
     {
         try {
-            conn = new JdbcConnectionSource("jdbc:sqlite:movies.db");
+            conn = new JdbcConnectionSource("jdbc:sqlite:movies.sqlite");
         } catch (SQLException e) {
             System.out.println("Błąd przy połączeniu z bazą danych... DataBase " + e);
         }
