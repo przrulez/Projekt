@@ -1,9 +1,15 @@
 package pl.prz.l04.appinterface;
 
+import com.j256.ormlite.dao.Dao;
 import java.awt.Font;
 import javax.swing.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.sql.SQLException;
+import java.util.Date;
+import java.util.Vector;
+import pl.prz.l04.database.DataBase;
+import pl.prz.l04.database.Movies;
 /**
  *
  * @author Pyciak
@@ -19,8 +25,10 @@ public class MovieAdd extends JFrame
     JTextField name = new JTextField("");
     JFrame frame;
     JTextArea desc = new JTextArea("");
-    JFileChooser file = new JFileChooser();
+    JFileChooser fileChooser = new JFileChooser();
     JButton fileButton = new JButton("Wybierz plik..");
+    String choosenFileName = new String();
+    private final Dao<Movies, Integer> Mov;
     
     MovieAdd()
     {
@@ -32,9 +40,10 @@ public class MovieAdd extends JFrame
         frame = this;
         
         /********************************************************/
-        String items[] = {"Kategoria 1","Kategoria 2","Kategoria 3","Kategoria 4"}; //z bazy danych
+        Mov = DataBase.getInstance().getMoviesDao();
+        Vector<String> catNamesList = DataBase.returnCategoriesList();
         /**********************************************************/ 
-        categories = new JComboBox(items);
+        categories = new JComboBox(catNamesList);
              
         
         label1.setLocation(10,10);
@@ -75,8 +84,11 @@ public class MovieAdd extends JFrame
         {
             public void actionPerformed(ActionEvent e)
             {
-                file.showOpenDialog(frame);
+                int returnVal = fileChooser.showOpenDialog(frame);
                 
+                if (returnVal == JFileChooser.APPROVE_OPTION) {
+                    choosenFileName = fileChooser.getSelectedFile().getAbsolutePath();
+                }
             }
         });
         
@@ -84,7 +96,16 @@ public class MovieAdd extends JFrame
         {
             public void actionPerformed(ActionEvent e)
             {
-                //Zapisanie
+                Movies newMovie = new Movies();
+                newMovie.setName(name.getText());
+                newMovie.setContent(desc.getText());
+                newMovie.setFile(choosenFileName);
+                newMovie.setCreated(new Date());
+                try {
+                    Mov.create(newMovie);
+                } catch (SQLException ex) {
+                    System.out.println("Błąd przy zapisywaniu nowego filmu... MovieAdd " + ex);
+                }
 
                 frame.setVisible(false);
             }

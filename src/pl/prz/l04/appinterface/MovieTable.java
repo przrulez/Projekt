@@ -190,8 +190,8 @@ public class MovieTable
                 
                 
                 SortTable sort = new SortTable();
-                Object benchmark = comboSortuj.getSelectedItem(); //odczytanie wybranej wartości comboBoxa
-                Object sortedData[][] = sort.sortTable(benchmark); //pobranie posortowanej tablicy
+                Object sortOrder = comboSortuj.getSelectedItem(); //odczytanie wybranej wartości comboBoxa
+                Object sortedData[][] = sort.sortTable(sortOrder); //pobranie posortowanej tablicy
                 
                 JPanel temp = new MovieTable(sortedData).getPanel();
                 temp.setLocation(0, 0);

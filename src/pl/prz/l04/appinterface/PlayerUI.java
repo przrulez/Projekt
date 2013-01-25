@@ -16,7 +16,7 @@ import javax.swing.JButton;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.border.LineBorder;
-import javax.swing.border.StrokeBorder;
+//import javax.swing.border.StrokeBorder;
 import pl.prz.l04.application.MediaPlayer;
 import pl.prz.l04.application.MovieBase;
 import uk.co.caprica.vlcj.component.EmbeddedMediaPlayerComponent;
