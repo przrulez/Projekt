@@ -7,9 +7,7 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.sql.SQLException;
 import java.util.Date;
-import java.util.List;
 import java.util.Vector;
-import pl.prz.l04.database.Categories;
 import pl.prz.l04.database.DataBase;
 import pl.prz.l04.database.Movies;
 /**
@@ -30,7 +28,6 @@ public class MovieAdd extends JFrame
     JFileChooser fileChooser = new JFileChooser();
     JButton fileButton = new JButton("Wybierz plik..");
     String choosenFileName = new String();
-    private final Dao<Categories, Integer> Cat;
     private final Dao<Movies, Integer> Mov;
     
     MovieAdd()
@@ -43,7 +40,6 @@ public class MovieAdd extends JFrame
         frame = this;
         
         /********************************************************/
-        Cat = DataBase.getInstance().getCategoriesDao();
         Mov = DataBase.getInstance().getMoviesDao();
         Vector<String> catNamesList = DataBase.returnCategoriesList();
         /**********************************************************/ 
