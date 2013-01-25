@@ -10,6 +10,8 @@ import com.j256.ormlite.jdbc.JdbcConnectionSource;
 import com.j256.ormlite.support.ConnectionSource;
 import com.j256.ormlite.table.TableUtils;
 import java.sql.SQLException;
+import java.util.List;
+import java.util.Vector;
 
 /**
  *
@@ -54,6 +56,24 @@ public class DataBase {
     private Dao<Movies, Integer> moviesDao;
     private Dao<Categories, Integer> categoriesDao;
     private Dao<CatMovies, Integer> catMovDao;
+    
+    public static Vector<String> returnCategoriesList() {
+        Dao<Categories,Integer> Cat = DataBase.getInstance().getCategoriesDao();
+        List<Categories> catList = new Vector<Categories>();
+        Vector<String> catNamesList = new Vector<String>();
+        try {
+            catList = Cat.queryForAll();
+        } catch (SQLException ex) {
+            System.out.println("Błąd przy pobieraniu kategorii... MovieAdd " + ex);
+        }
+        for( Categories item : catList)
+        {
+            catNamesList.add(item.getName());
+        }
+        if(catNamesList.isEmpty())
+            catNamesList.add("Brak kategorii!!");
+        return catNamesList;
+    }
     
         /**
      * @return the moviesDao

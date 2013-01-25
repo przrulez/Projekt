@@ -4,6 +4,8 @@ import java.awt.Font;
 import javax.swing.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.util.Vector;
+import pl.prz.l04.database.DataBase;
 /**
  *
  * @author Pyciak
@@ -19,8 +21,9 @@ public class MovieEdit extends JFrame
     JTextField name;
     JFrame frame;
     JTextArea desc;
-    JFileChooser file = new JFileChooser();
+    JFileChooser fileChooser = new JFileChooser();
     JButton fileButton = new JButton("Wybierz plik..");
+    String choosenFileName = new String();
     
     MovieEdit(int id)
     {
@@ -32,9 +35,7 @@ public class MovieEdit extends JFrame
         frame = this;
         
         /********************************************************/
-        String items[] = {"Kategoria 1","Kategoria 2","Kategoria 3","Kategoria 4"}; //z bazy danych
-        name = new JTextField("Nazwa"+id);
-        desc = new JTextArea("Opis filmu"+id);
+        Vector items = DataBase.returnCategoriesList();
         /**********************************************************/ 
         categories = new JComboBox(items);
              
@@ -77,8 +78,11 @@ public class MovieEdit extends JFrame
         {
             public void actionPerformed(ActionEvent e)
             {
-                file.showOpenDialog(frame);
+                int returnVal = fileChooser.showOpenDialog(frame);
                 
+                if (returnVal == JFileChooser.APPROVE_OPTION) {
+                    choosenFileName = fileChooser.getSelectedFile().getAbsolutePath();
+                }
             }
         });
         
