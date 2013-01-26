@@ -1,0 +1,21 @@
+
+	Zarz¹dzanie przez www - instalacja:
+
+
+Wymagania:
+
+- PHP 5
+
+- MySQL
+
+  -> Utwórz bazê danych o nazwie 'movies', w przypadku wpisania innej nazwy
+     konieczna bêdzie edycja pliku konfiguracyjnego app/Config/database.php
+
+  -> Zaimportuj strukturê bazy danych do nowo utworzonej bazy, plik 'movies.sql'
+
+
+
+Po utworzeniu bazy danych i ewentualnej zmianie konfiguracji nale¿y skopiowaæ
+folder 'p04' na serwer lub w odpowiednie miejsce na dysku twardym (je¿eli 
+korzystamy z aplikacji lokalnie).
+W przypadku korzystnaia z XAMPP'a folder nale¿y skopiowaæ do C:\xampp\htdocs\
