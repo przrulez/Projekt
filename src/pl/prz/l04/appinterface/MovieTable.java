@@ -66,7 +66,7 @@ public class MovieTable
         
         CatMov = DataBase.getInstance().getCatMovDao();
         
-        Object gotoweDane[][] = null;
+        Object gotoweDane[][] = new Object[dane.size()][];
         
         for (int i = 0; i < dane.size(); i++)
         {
