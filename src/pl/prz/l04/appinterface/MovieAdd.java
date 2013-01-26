@@ -2,12 +2,16 @@ package pl.prz.l04.appinterface;
 
 import com.j256.ormlite.dao.Dao;
 import java.awt.Font;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javax.swing.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.sql.SQLException;
 import java.util.Date;
 import java.util.Vector;
+import pl.prz.l04.database.CatMovies;
+import pl.prz.l04.database.Categories;
 import pl.prz.l04.database.DataBase;
 import pl.prz.l04.database.Movies;
 /**
@@ -28,7 +32,9 @@ public class MovieAdd extends JFrame
     JFileChooser fileChooser = new JFileChooser();
     JButton fileButton = new JButton("Wybierz plik..");
     String choosenFileName = new String();
-    private final Dao<Movies, Integer> Mov;
+    private  Dao<Movies, Integer> Mov;
+    private  Dao<Categories, Integer> Cat;
+    private  Dao<CatMovies, Integer> CatMov;
     
     MovieAdd()
     {
@@ -41,6 +47,8 @@ public class MovieAdd extends JFrame
         
         /********************************************************/
         Mov = DataBase.getInstance().getMoviesDao();
+        Cat = DataBase.getInstance().getCategoriesDao();
+        CatMov = DataBase.getInstance().getCatMovDao();
         Vector<String> catNamesList = DataBase.returnCategoriesList();
         /**********************************************************/ 
         categories = new JComboBox(catNamesList);
@@ -105,6 +113,23 @@ public class MovieAdd extends JFrame
                     Mov.create(newMovie);
                 } catch (SQLException ex) {
                     System.out.println("Błąd przy zapisywaniu nowego filmu... MovieAdd " + ex);
+                }
+                
+                String catName = (String) categories.getSelectedItem();
+                Categories category = new Categories();
+                try {
+                    category = Cat.queryForEq("name", catName).get(0);
+                } catch (SQLException ex) {
+                    System.out.println("Błąd przy szukaniu kategorii... MovieAdd " + ex);
+                }
+                
+                CatMovies catMovLink = new CatMovies();
+                catMovLink.setMovie(newMovie);
+                catMovLink.setCategory(category);
+                try {
+                    CatMov.create(catMovLink);
+                } catch (SQLException ex) {
+                    System.out.println("Błąd przy zapisywaniu kategoria-film... MovieAdd " + ex);
                 }
 
                 frame.setVisible(false);

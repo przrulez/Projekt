@@ -31,7 +31,7 @@ public class MovieTable
         
         for(CatMovies item : categoryList)
         {
-            result += item.getCategory().getName();
+            result += item.getCategory().getName().toString();
         }
         
         return result;
