@@ -13,7 +13,7 @@
 		<td><?php echo h($playlist['Playlist']['id']); ?>&nbsp;</td>
 		<td><?php echo h($playlist['Playlist']['name']); ?>&nbsp;</td>
 		<td>
-			<?php echo $this->Html->link($playlist['User']['id'], array('controller' => 'users', 'action' => 'view', $playlist['User']['id'])); ?>
+			<?php echo $this->Html->link($playlist['User']['login'], array('controller' => 'users', 'action' => 'view', $playlist['User']['id'])); ?>
 		</td>
 		<td class="actions">
 			<?php echo $this->Html->link(__('View'), array('action' => 'view', $playlist['Playlist']['id'])); ?>
