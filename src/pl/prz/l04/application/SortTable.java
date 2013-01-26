@@ -7,6 +7,7 @@ package pl.prz.l04.application;
 import com.j256.ormlite.dao.Dao;
 import java.sql.*;
 import java.util.List;
+import java.util.Vector;
 import pl.prz.l04.database.CatMovies;
 import pl.prz.l04.database.Categories;
 import pl.prz.l04.database.DataBase;
@@ -22,8 +23,9 @@ public class SortTable {
     Object[][] dane = new Object[8][4];
     private Dao<Movies, Integer> Mov;
     private Dao<CatMovies, Integer> CatMov;
+    List<Movies> list = new Vector<Movies>();
 
-    public Object[][] sortTable(Object benchmark) {
+    public List<Movies> sortTable(Object benchmark) {
         try {
             Mov = DataBase.getInstance().getMoviesDao();
             CatMov = DataBase.getInstance().getCatMovDao();
@@ -43,7 +45,7 @@ public class SortTable {
                 order_by = "id";
             }
             
-            List<Movies> list = Mov.query(
+            list = Mov.query(
                     Mov.queryBuilder().selectColumns("name", "created")
                             .orderBy(order_by, true)
                             .prepare());
@@ -78,6 +80,7 @@ public class SortTable {
         } catch (Exception e) {
             System.out.println("Błąd przy pobieraniu danych... SortTable " + e);
         }
-        return dane;
+//        return dane;
+        return list;
     }
 }

@@ -1,23 +1,49 @@
 package pl.prz.l04.appinterface;
 
+import com.j256.ormlite.dao.Dao;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.sql.SQLException;
+import java.util.Vector;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javax.swing.*;
 import pl.prz.l04.application.SortTable;
+import pl.prz.l04.database.CatMovies;
+import pl.prz.l04.database.DataBase;
+import pl.prz.l04.database.Movies;
 /**
  *
  * @author Pyciak
  */
 public class MovieTable
 {
+
+    private String getCategoriesFor(Movies movie) {
+        String result = new String("");
+        java.util.List<CatMovies> categoryList = new Vector<CatMovies>();
+        try {
+            categoryList = CatMov.queryForEq("movie_id", movie.getId());
+        } catch (SQLException ex) {
+            System.out.println("Błąd przy pobieraniu listy fim-kategoria... MovieTable" + ex);
+        }
+        
+        for(CatMovies item : categoryList)
+        {
+            result += item.getCategory().getName();
+        }
+        
+        return result;
+    }
     JPanel panel = new JPanel();
     JTable movies;
     JButton sortuj;
     JComboBox comboSortuj;
-    Object data[][];
+    Vector<Movies> data;
+    private Dao<CatMovies, Integer> CatMov;
     
-    MovieTable(Object dane[][])
+    MovieTable(Vector<Movies> dane)
     {
         PlayerUI.getInstance().setMainJPanel(panel);
         
@@ -38,14 +64,34 @@ public class MovieTable
         panel.add(sortuj);
         sortuj.addActionListener(new menuActionListener());//dodanie słuchacza zdarzeń przycisku sortuj
         
-        for (int i = 0; i < dane.length; i++)
+        CatMov = DataBase.getInstance().getCatMovDao();
+        
+        Object gotoweDane[][] = null;
+        
+        for (int i = 0; i < dane.size(); i++)
         {
-            dane[i] = push(dane[i]);
+            String p1 = "Szczegóły";
+            String p2 = "Oglądaj";
+            String p3 = "Dodaj do listy";
+            String p4 = "Edytuj";
+            String p5 = "Usuń";
+
+            Object[] longer = new Object[9];
+            longer[0] = i;
+            longer[1] = dane.get(i).getName();
+            longer[2] = getCategoriesFor(dane.get(i));
+            longer[3] = dane.get(i).getCreated();
+            longer[4] = p1;
+            longer[5] = p2;
+            longer[6] = p3;
+            longer[7] = p4;
+            longer[8] = p5;
+            gotoweDane[i] = longer;
         }
         
         String opisy[] = {"Lp","Tytuł ","Kategoria","Utworzony","","","Operacje","",""};
         
-        movies = new JTable(dane,opisy)
+        movies = new JTable(gotoweDane,opisy)
         {
              public boolean isCellEditable(int row, int col)//zablokowanie możliwość edycji
              {
@@ -83,7 +129,7 @@ public class MovieTable
         return panel;
     }
     
-    private static Object[] push(Object[] array) 
+    private Object[] expand(Movies movie, int i) 
     {
         String p1 = "Szczegóły";
         String p2 = "Oglądaj";
@@ -91,16 +137,16 @@ public class MovieTable
         String p4 = "Edytuj";
         String p5 = "Usuń";
         
-        Object[] longer = new Object[array.length + 5];
-        for (int i = 0; i < array.length; i++)
-        {
-            longer[i] = array[i];
-        }
-        longer[array.length] = p1;
-        longer[array.length+1] = p2;
-        longer[array.length+2] = p3;
-        longer[array.length+3] = p4;
-        longer[array.length+4] = p5;
+        Object[] longer = new Object[9];
+        longer[0] = i;
+        longer[1] = movie.getName();
+        longer[2] = getCategoriesFor(movie);
+        longer[3] = movie.getCreated();
+        longer[4] = p1;
+        longer[5] = p2;
+        longer[6] = p3;
+        longer[7] = p4;
+        longer[8] = p5;
         return longer;
     }
     
@@ -191,9 +237,9 @@ public class MovieTable
                 
                 SortTable sort = new SortTable();
                 Object sortOrder = comboSortuj.getSelectedItem(); //odczytanie wybranej wartości comboBoxa
-                Object sortedData[][] = sort.sortTable(sortOrder); //pobranie posortowanej tablicy
+                java.util.List<Movies> sortedData = sort.sortTable(sortOrder); //pobranie posortowanej tablicy
                 
-                JPanel temp = new MovieTable(sortedData).getPanel();
+                JPanel temp = new MovieTable(new Vector<Movies>(sortedData)).getPanel();
                 temp.setLocation(0, 0);
                 temp.setSize(820, 600);
 

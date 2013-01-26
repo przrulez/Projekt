@@ -1,11 +1,19 @@
 package pl.prz.l04.appinterface;
 
+import com.j256.ormlite.dao.Dao;
 import java.awt.*;
+import java.sql.SQLException;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javax.swing.*;
 import javax.swing.table.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.Vector;
+import pl.prz.l04.database.CatMovies;
+import pl.prz.l04.database.Categories;
+import pl.prz.l04.database.DataBase;
+import pl.prz.l04.database.Movies;
 
 /**
  *
@@ -27,6 +35,9 @@ public class MainWindow extends JFrame
     JButton AddMovie;
     JButton AddCategory;
     JButton Search;
+    private Dao<Categories, Integer> Cat;
+    private Dao<Movies, Integer> Mov;
+    private Dao<CatMovies, Integer> CatMov;
     
     public MainWindow()
     {
@@ -34,6 +45,10 @@ public class MainWindow extends JFrame
         setSize(1000, 600);
         setDefaultCloseOperation(javax.swing.JFrame.EXIT_ON_CLOSE);
         setLocationRelativeTo(null);//wycentorwanie
+        
+        Cat = DataBase.getInstance().getCategoriesDao();
+        Mov = DataBase.getInstance().getMoviesDao();
+        CatMov = DataBase.getInstance().getCatMovDao();
         
         makeMenuBar();
         makeLeftPanel();
@@ -112,16 +127,22 @@ public class MainWindow extends JFrame
         rightPanel.setLayout(null);
         rightPanel.setPreferredSize(new Dimension(820,600));
         
-        Object dane[][] = {{"1","Tytuł 1","ICK","12.10.2012"},
-                            {"2","Tytuł 2","bICK","12.10.2012"},
-                            {"3","Tytuł5","aICK","14.10.2012"},
-                            {"4","Tytuł 4","ICKx","12.10.2012"},
-                            {"5","Tytuł Filmu może być długi","ICK x","12.11.2012"},
-                            {"6","Tytul","ICK s","12.10.2011"},
-                            {"7","Tytuł","ICK","12.10.2012"}};
+        java.util.List<Movies> moviesList = new Vector<Movies>();
+        try {
+            moviesList = Mov.queryForAll();
+        } catch (SQLException ex) {
+            System.out.println("Błąd przy pobieraniu listy filmów... MainWindow " + ex);
+        }
+        
+        if(moviesList.isEmpty())
+        {
+            Movies newMovie = new Movies();
+            newMovie.setName("Brak filmów!!!!!!");
+            moviesList.add( newMovie);
+        }
         
 
-        JPanel temp = new MovieTable(dane).getPanel();
+        JPanel temp = new MovieTable(new Vector<Movies>(moviesList)).getPanel();
         temp.setLocation(0, 0);
         temp.setSize(820, 600);
         

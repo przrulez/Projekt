@@ -6,6 +6,7 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.sql.*;
 import java.util.List;
+import java.util.Vector;
 import pl.prz.l04.database.CatMovies;
 import pl.prz.l04.database.Categories;
 import pl.prz.l04.database.DataBase;
@@ -27,6 +28,7 @@ public class Search extends JFrame {
     JPanel rightPanel;
     private final Dao<Movies, Integer> Mov;
     private final Dao<CatMovies, Integer> CatMov;
+    List<Movies> moviesList = null;
 
     Search(JPanel mainPanel) {
         String name[];
@@ -76,6 +78,7 @@ public class Search extends JFrame {
         button.setSize(70, 25);
 
         button.addActionListener(new ActionListener() {
+
             public void actionPerformed(ActionEvent e) {
                 //Zapisanie
                 String nazwa;
@@ -106,16 +109,16 @@ public class Search extends JFrame {
 
         String[] name = new String[50]; //zmienna na kategorie pobrane z bazy
         // łączymy się z bazą danych
-        
+
         int size = 1;
         // wykonujemy SELECT i wypisujemy wynik zapytania na ekran
         try {
             Cat = DataBase.getInstance().getCategoriesDao();
             List<Categories> rs = Cat.queryForAll();
             int i = 1;
-            
+
             name[0] = "Wszystkie kategorie";
-            for(Categories item : rs) {
+            for (Categories item : rs) {
                 name[i] = item.getName();
                 i++;
                 size++;
@@ -125,7 +128,7 @@ public class Search extends JFrame {
         }
         //zmniejszenie wielkosci tablicy dla lepszego wyswietlenia
         String[] kategorie = new String[size];
-        for(int i = 0; i < size; i++){
+        for (int i = 0; i < size; i++) {
             kategorie[i] = name[i];
         }
         return kategorie;
@@ -136,52 +139,43 @@ public class Search extends JFrame {
         try {
             String query = null;
             String warunek = null;
-            List<Movies> moviesList = null;
+            
 
             // If conditions are not set, broadest possible search will be made
-            if(nazwa.isEmpty())
+            if (nazwa.isEmpty()) {
                 nazwa = "*";
-            if(opis.isEmpty())
+            }
+            if (opis.isEmpty()) {
                 opis = "*";
-            if(category.isEmpty())
+            }
+            if (category.isEmpty()) {
                 category = "*";
-            
+            }
+
             if (category == "Wszystkie kategorie") {
                 moviesList =
                         Mov.query(
-                        Mov.queryBuilder().where()
-                        .like("name", nazwa)
-                        .and()
-                        .like("content", opis)
-                        .prepare());
+                        Mov.queryBuilder().where().like("name", nazwa).and().like("content", opis).prepare());
             } else if (category != "Wszystkie kategorie") {
                 List<Categories> lookUpCat = Cat.queryForEq("name", category);
-                List<CatMovies> lookUpCatMov = 
+                List<CatMovies> lookUpCatMov =
                         CatMov.query(
-                        CatMov.queryBuilder()
-                        .selectColumns("movies")
-                        .where()
-                        .eq("name", lookUpCat.get(0).getId())
-                        .prepare());
+                        CatMov.queryBuilder().selectColumns("movies").where().eq("name", lookUpCat.get(0).getId()).prepare());
                 moviesList =
                         Mov.query(
-                        Mov.queryBuilder().where()
-                        .like("name", nazwa)
-                        .and()
-                        .like("content", opis)
-                        .in("id", lookUpCatMov)
-                        .prepare());
+                        Mov.queryBuilder().where().like("name", nazwa).and().like("content", opis).in("id", lookUpCatMov).prepare());
             }
-            
+
             int size = moviesList.size();
-            if( size == 0)
+            if (size == 0) {
                 size++;             // miejsce na "brak wyników"
+            }
             data = new Object[size][4];
             String films;           // nazwa filmu
             String created;         // nazwa kateogri
             int i = 0;              // inkdes tablicy
             int id;                 // id filmu
-            for(Movies item : moviesList) {     // wpisanie do tablicy wszystkich istniejacych filmow
+            for (Movies item : moviesList) {     // wpisanie do tablicy wszystkich istniejacych filmow
                 films = item.getName();
                 created = item.getCreated().toString();
                 id = item.getId();
@@ -194,22 +188,22 @@ public class Search extends JFrame {
 
             }
             // wpisanie informacji jesli nie znaleziono zadnego filmu
-             if(znalezionoFilm == 0)   {
-               data[i][0] = 1;
-               data[i][1] = "Brak wyników";
-               data[i][2] = "-";
-               data[i][3] = "-";
-             }
-            
+            if (znalezionoFilm == 0) {
+                data[i][0] = 1;
+                data[i][1] = "Brak wyników";
+                data[i][2] = "-";
+                data[i][3] = "-";
+            }
+
         } catch (Exception e) {
             System.out.println("Błąd przy pobieraniu danych... Search");
         }
 
-        
+
         Object dane[][] = data;
         rightPanel.removeAll();
-        JPanel panel = new MovieTable(dane).getPanel();
-
+//        JPanel panel = new MovieTable(dane).getPanel();
+        JPanel panel = new MovieTable(new Vector<Movies>(moviesList)).getPanel();
         panel.setLocation(0, 0);
         panel.setSize(820, 600);
 
