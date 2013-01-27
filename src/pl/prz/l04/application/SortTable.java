@@ -40,9 +40,6 @@ public class SortTable {
                 order_by = "category";
             } else if (benchmark == "Nazwa") {
                 order_by = "name";
-//            } else if (benchmark == "Losowo") {
-//                order_by = ""
-//                movies = st.executeQuery("SELECT id, name, created FROM movies ORDER BY RAND()");
             } else if (benchmark == "Kolejność") {
                 order_by = "id";
             }

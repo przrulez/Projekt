@@ -48,7 +48,7 @@ public class MovieTable
         PlayerUI.getInstance().setMainJPanel(panel);
         
         data = dane;
-        String items[] = {"Kategoria","Kolejność","Nazwa","Losowo"};
+        String items[] = {"Kategoria","Kolejność","Nazwa"};
         comboSortuj = new JComboBox(items);
         sortuj = new JButton("Sortuj");
         
