@@ -5,6 +5,7 @@ import javax.swing.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.sql.*;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Vector;
 import pl.prz.l04.database.CatMovies;
@@ -161,15 +162,23 @@ public class Search extends JFrame {
                         Mov.query(
                         Mov.queryBuilder().where().like("name", nazwa).and().like("content", opis).prepare());
             } else  {
-                category = "%" + category + "%";
+//                category = "%" + category + "%";
                 System.out.println("B!");
                 List<Categories> lookUpCat = Cat.queryForEq("name", category);
+                System.out.println("C!");
                 List<CatMovies> lookUpCatMov =
                         CatMov.query(
-                        CatMov.queryBuilder().selectColumns("movies").where().eq("name", lookUpCat.get(0).getId()).prepare());
+                        CatMov.queryBuilder().selectColumns("movie_id").where().eq("category_id", lookUpCat.get(0).getId()).prepare());
+                System.out.println("D!");
+                String catMovString = "";
+                for(CatMovies item : lookUpCatMov)
+                {
+                    catMovString += item.getMovie().getId().toString() + ", ";
+                }
+                catMovString = catMovString.substring(0, catMovString.length() - 2);
                 moviesList =
                         Mov.query(
-                        Mov.queryBuilder().where().like("name", nazwa).and().like("content", opis).in("id", lookUpCatMov).prepare());
+                        Mov.queryBuilder().where().like("name", nazwa).and().like("content", opis).and().in("id", catMovString).prepare());
             }
 
             int size = moviesList.size();
@@ -202,7 +211,7 @@ public class Search extends JFrame {
             }
 
         } catch (Exception e) {
-            System.out.println("Błąd przy pobieraniu danych... Search");
+            System.out.println("Błąd przy pobieraniu danych... Search " + e);
         }
 
 
