@@ -36,6 +36,8 @@ public class SortTable {
              + " JOIN categories ON (categories.id = categories_movies.category_id) ORDER BY movies.id");*/
             if (benchmark == "Data utworzenia") {
                 order_by = "created";
+            } else if (benchmark == "Kategoria"){
+                order_by = "category";
             } else if (benchmark == "Nazwa") {
                 order_by = "name";
 //            } else if (benchmark == "Losowo") {

@@ -81,9 +81,9 @@ public class Search extends JFrame {
 
             public void actionPerformed(ActionEvent e) {
                 //Zapisanie
-                String nazwa;
-                String opis;
-                String category;
+                String nazwa = "";
+                String opis = "";
+                String category = "";
                 Object o;
                 nazwa = field1.getText();
                 opis = field2.getText();
@@ -137,26 +137,32 @@ public class Search extends JFrame {
     public void PrintMovies(String nazwa, String opis, String category) {
         int znalezionoFilm = 0;  //ustawiane na 1, gdy znajdzie jakis film
         try {
-            String query = null;
-            String warunek = null;
-            
-
             // If conditions are not set, broadest possible search will be made
             if (nazwa.isEmpty()) {
-                nazwa = "*";
+                nazwa = "%";
+            } else {
+                nazwa = "%" + nazwa + "%";
             }
             if (opis.isEmpty()) {
-                opis = "*";
+                opis = "%";
+            } else {
+                opis = "%" + opis + "%";
             }
             if (category.isEmpty()) {
-                category = "*";
+                category = "%";
             }
-
+                
+            
+            System.out.println("Nazwa: " + nazwa + "Opis: " + opis + "Category: " + category);
+            
             if (category == "Wszystkie kategorie") {
+                System.out.println("A!");
                 moviesList =
                         Mov.query(
                         Mov.queryBuilder().where().like("name", nazwa).and().like("content", opis).prepare());
-            } else if (category != "Wszystkie kategorie") {
+            } else  {
+                category = "%" + category + "%";
+                System.out.println("B!");
                 List<Categories> lookUpCat = Cat.queryForEq("name", category);
                 List<CatMovies> lookUpCatMov =
                         CatMov.query(
