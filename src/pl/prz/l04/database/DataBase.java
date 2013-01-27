@@ -91,6 +91,24 @@ public class DataBase {
         return catMovString;
         }
     
+    public static String getCategoriesFor(Movies movie) {
+        Dao<CatMovies, Integer> CatMov = DataBase.getInstance().getCatMovDao();
+        String result = new String("");
+        java.util.List<CatMovies> categoryList = new Vector<CatMovies>();
+        try {
+            categoryList = CatMov.queryForEq("movie_id", movie.getId());
+        } catch (SQLException ex) {
+            System.out.println("Błąd przy pobieraniu listy fim-kategoria... MovieTable" + ex);
+        }
+        
+        for(CatMovies item : categoryList)
+        {
+            result += item.getCategory().getName().toString();
+        }
+        
+        return result;
+    }
+    
         /**
      * @return the moviesDao
      */

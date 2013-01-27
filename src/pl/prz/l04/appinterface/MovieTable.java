@@ -19,29 +19,14 @@ import pl.prz.l04.database.Movies;
  */
 public class MovieTable
 {
-
-    private String getCategoriesFor(Movies movie) {
-        String result = new String("");
-        java.util.List<CatMovies> categoryList = new Vector<CatMovies>();
-        try {
-            categoryList = CatMov.queryForEq("movie_id", movie.getId());
-        } catch (SQLException ex) {
-            System.out.println("Błąd przy pobieraniu listy fim-kategoria... MovieTable" + ex);
-        }
-        
-        for(CatMovies item : categoryList)
-        {
-            result += item.getCategory().getName().toString();
-        }
-        
-        return result;
-    }
+    private Dao<Movies, Integer> Mov;
     JPanel panel = new JPanel();
     JTable movies;
     JButton sortuj;
     JComboBox comboSortuj;
     Vector<Movies> data;
     private Dao<CatMovies, Integer> CatMov;
+    Object gotoweDane[][];
     
     MovieTable(Vector<Movies> dane)
     {
@@ -65,8 +50,9 @@ public class MovieTable
         sortuj.addActionListener(new menuActionListener());//dodanie słuchacza zdarzeń przycisku sortuj
         
         CatMov = DataBase.getInstance().getCatMovDao();
+        Mov = DataBase.getInstance().getMoviesDao();
         
-        Object gotoweDane[][] = new Object[dane.size()][];
+        gotoweDane = new Object[dane.size()][];
         
         for (int i = 0; i < dane.size(); i++)
         {
@@ -79,7 +65,7 @@ public class MovieTable
             Object[] longer = new Object[9];
             longer[0] = i;
             longer[1] = dane.get(i).getName();
-            longer[2] = getCategoriesFor(dane.get(i));
+            longer[2] = DataBase.getCategoriesFor(dane.get(i));
             longer[3] = dane.get(i).getCreated();
             longer[4] = p1;
             longer[5] = p2;
@@ -140,7 +126,7 @@ public class MovieTable
         Object[] longer = new Object[9];
         longer[0] = i;
         longer[1] = movie.getName();
-        longer[2] = getCategoriesFor(movie);
+        longer[2] = DataBase.getCategoriesFor(movie);
         longer[3] = movie.getCreated();
         longer[4] = p1;
         longer[5] = p2;
@@ -192,8 +178,17 @@ public class MovieTable
         public void actionPerformed(ActionEvent e)
         {
             int id = Integer.valueOf(e.getActionCommand());
+            Movies movie = new Movies();
+            String movieName = (String) gotoweDane[id][1];
+            MovieEdit wnd;
+            try {
+                movie = Mov.queryForEq("name", movieName).get(0);;
+                
+            } catch (SQLException ex) {
+                System.out.println("Błąd przy pobieraniu filmu... MovieTable" + ex);
+            }
             
-            MovieEdit wnd = new MovieEdit(id);
+            wnd = new MovieEdit(movie);
             wnd.setLocationRelativeTo(null);
             wnd.setVisible(true);
         }
