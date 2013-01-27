@@ -152,30 +152,17 @@ public class Search extends JFrame {
             if (category.isEmpty()) {
                 category = "%";
             }
-                
-            
+
+
             System.out.println("Nazwa: " + nazwa + "Opis: " + opis + "Category: " + category);
-            
+
             if (category == "Wszystkie kategorie") {
                 System.out.println("A!");
                 moviesList =
                         Mov.query(
                         Mov.queryBuilder().where().like("name", nazwa).and().like("content", opis).prepare());
-            } else  {
-//                category = "%" + category + "%";
-                System.out.println("B!");
-                List<Categories> lookUpCat = Cat.queryForEq("name", category);
-                System.out.println("C!");
-                List<CatMovies> lookUpCatMov =
-                        CatMov.query(
-                        CatMov.queryBuilder().selectColumns("movie_id").where().eq("category_id", lookUpCat.get(0).getId()).prepare());
-                System.out.println("D!");
-                String catMovString = "";
-                for(CatMovies item : lookUpCatMov)
-                {
-                    catMovString += item.getMovie().getId().toString() + ", ";
-                }
-                catMovString = catMovString.substring(0, catMovString.length() - 2);
+            } else {
+                String catMovString = DataBase.getInstance().getMoviesIdsFor(category);
                 moviesList =
                         Mov.query(
                         Mov.queryBuilder().where().like("name", nazwa).and().like("content", opis).and().in("id", catMovString).prepare());

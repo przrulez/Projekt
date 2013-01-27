@@ -24,11 +24,13 @@ public class SortTable {
     private Dao<Movies, Integer> Mov;
     private Dao<CatMovies, Integer> CatMov;
     List<Movies> list = new Vector<Movies>();
+    private Dao<Categories, Integer> Cat;
 
     public List<Movies> sortTable(Object benchmark) {
         try {
             Mov = DataBase.getInstance().getMoviesDao();
             CatMov = DataBase.getInstance().getCatMovDao();
+            Cat = DataBase.getInstance().getCategoriesDao();
             
             String order_by = "name";
             /*ResultSet rs = st.executeQuery("SELECT DISTINCT movies.id, movies.name, categories.name as kategoria, movies.created FROM movies"
@@ -44,10 +46,22 @@ public class SortTable {
                 order_by = "id";
             }
             
+            if (order_by != "category")
+            {
             list = Mov.query(
                     Mov.queryBuilder().selectColumns("name", "created")
                             .orderBy(order_by, true)
                             .prepare());
+            } else {
+                for(Categories item : Cat.query(Cat.queryBuilder().orderBy("name", false).prepare()))
+                {
+                    list.addAll(Mov.query(
+                            Mov.queryBuilder().where()
+                            .in("id", DataBase.getInstance().getMoviesIdsFor(item.getName()))
+                            .prepare())
+                            );
+                }
+            }
             
             int i = 0;
             for(Movies item : list) {

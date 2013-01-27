@@ -75,6 +75,22 @@ public class DataBase {
         return catNamesList;
     }
     
+    public static String getMoviesIdsFor(String category) throws SQLException {
+        Dao<CatMovies, Integer> CatMov = DataBase.getInstance().getCatMovDao();
+        Dao<Categories, Integer> Cat = DataBase.getInstance().getCategoriesDao();
+        List<Categories> lookUpCat = Cat.queryForEq("name", category);
+        List<CatMovies> lookUpCatMov =
+                CatMov.query(
+                CatMov.queryBuilder().selectColumns("movie_id").where().eq("category_id", lookUpCat.get(0).getId()).prepare());
+        String catMovString = "";
+        for(CatMovies item : lookUpCatMov)
+        {
+            catMovString += item.getMovie().getId().toString() + ", ";
+        }
+        catMovString = catMovString.substring(0, catMovString.length() - 2);
+        return catMovString;
+        }
+    
         /**
      * @return the moviesDao
      */
