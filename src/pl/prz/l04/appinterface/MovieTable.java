@@ -155,8 +155,14 @@ public class MovieTable {
 
             panel.removeAll();
             panel.repaint();
-
-            PlayerUI.getInstance().preparePanel();
+            Movies play = new Movies();
+            try {
+                play = Mov.queryForEq("name", gotoweDane[id][1]).get(0);
+            } catch (SQLException ex) {
+                System.out.println("Błąd przy pobieraniu filmu... MobieTable" + ex);
+            }
+            
+            PlayerUI.getInstance().preparePanel(play.getFile());
 
             // powrot
             JButton button = new JButton("Powrót");

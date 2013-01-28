@@ -48,7 +48,7 @@ public class PlayerUI {
     private PlayerUI() {
     }
     
-    public void preparePanel() {
+    public void preparePanel(String file) {
 
         String title = "test odtwarzacza";
         
@@ -103,7 +103,7 @@ public class PlayerUI {
         playtimeJLabel.setLocation(100, 450);
         mainJPanel.add(playtimeJLabel);
         
-        MovieBase.getInstance().getMediaPlayer().prepareMedia();
+        MovieBase.getInstance().getMediaPlayer().prepareMedia(file);
         
         playtimeTimer = new Timer();
         startRefreshing();

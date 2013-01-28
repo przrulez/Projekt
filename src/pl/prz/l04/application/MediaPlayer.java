@@ -18,9 +18,9 @@ public class MediaPlayer {
         this.mediaPlayerComponent = mediaPlayerComponent;
     }
     
-    public Boolean prepareMedia() {
-        //String mrl = "file:///E:/utorrent/downloaded/Supernatural.S08E05.HDTV.x264-LOL.mp4";
-        String mrl = "http://www.youtube.com/watch?v=YZ7ASpL_Rkk";
+    public Boolean prepareMedia(String file) {
+        String mrl = file;
+        //String mrl = "http://www.youtube.com/watch?v=YZ7ASpL_Rkk";
         //mediaPlayerComponent.getMediaPlayer().playMedia(mrl);
         return mediaPlayerComponent.getMediaPlayer().prepareMedia(mrl);
     }

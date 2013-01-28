@@ -21,7 +21,7 @@ public class Movies {
     private String name;
     @DatabaseField(canBeNull = false, dataType = DataType.LONG_STRING)
     private String content;
-    @DatabaseField(canBeNull = false, width = 45)
+    @DatabaseField(canBeNull = false, dataType = DataType.LONG_STRING)
     private String file;
     @DatabaseField(canBeNull = false)
     private Date created;
