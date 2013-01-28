@@ -249,8 +249,15 @@ public class MovieTable {
 
         public void actionPerformed(ActionEvent e) {
             int id = Integer.valueOf(e.getActionCommand());
+            
+            Movies selectedMovie = new Movies();
+            try {
+                selectedMovie = Mov.queryForEq("name", gotoweDane[id][1]).get(0);
+            } catch (SQLException ex) {
+                System.out.println("Błąd przy pobieraniu filmu" + ex);
+            }
 
-            ListAddMovie wnd = new ListAddMovie(id);
+            ListAddMovie wnd = new ListAddMovie(selectedMovie);
             wnd.setLocationRelativeTo(null);
             wnd.setVisible(true);
         }
