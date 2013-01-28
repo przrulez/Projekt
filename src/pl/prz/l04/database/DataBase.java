@@ -37,6 +37,7 @@ public class DataBase {
             TableUtils.createTableIfNotExists(conn, Movies.class);
             TableUtils.createTableIfNotExists(conn, Categories.class);
             TableUtils.createTableIfNotExists(conn, CatMovies.class);
+            TableUtils.createTableIfNotExists(conn, Playlist.class);
         } catch (SQLException e) {
             System.out.println("Błąd przy próbie tworzenia tabel... DataBase " + e);
         }
@@ -45,6 +46,7 @@ public class DataBase {
             moviesDao = DaoManager.createDao(conn, Movies.class);
             categoriesDao = DaoManager.createDao(conn, Categories.class);
             catMovDao = DaoManager.createDao(conn, CatMovies.class);
+            playDao = DaoManager.createDao(conn, Playlist.class);
             
         } catch (SQLException e) {
             System.out.println("Błąd przy tworzeniu Dao... DataBase " + e);
@@ -56,6 +58,7 @@ public class DataBase {
     private Dao<Movies, Integer> moviesDao;
     private Dao<Categories, Integer> categoriesDao;
     private Dao<CatMovies, Integer> catMovDao;
+    private Dao<Playlist, Integer> playDao;
     
     public static Vector<String> returnCategoriesList() {
         Dao<Categories,Integer> Cat = DataBase.getInstance().getCategoriesDao();
@@ -128,5 +131,12 @@ public class DataBase {
      */
     public Dao<CatMovies, Integer> getCatMovDao() {
         return catMovDao;
+    }
+
+    /**
+     * @return the playDao
+     */
+    public Dao<Playlist, Integer> getPlayDao() {
+        return playDao;
     }
 }
